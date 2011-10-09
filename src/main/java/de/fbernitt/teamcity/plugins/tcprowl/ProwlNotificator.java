@@ -35,8 +35,8 @@ public class ProwlNotificator implements Notificator {
 
     public ProwlNotificator(NotificatorRegistry notificatorRegistry) {
         Loggers.SERVER.info("Registering " + TYPE_NAME);
-        userPropertyInfos.add(new UserPropertyInfo(PROWL_API_KEY, "Prowl API Key"));
-        notificatorRegistry.register(this, userPropertyInfos);
+        this.userPropertyInfos.add(new UserPropertyInfo(PROWL_API_KEY, "Prowl API Key"));
+        notificatorRegistry.register(this, this.userPropertyInfos);
     }
 
     public void notifyBuildStarted(SRunningBuild sRunningBuild, Set<SUser> sUsers) {

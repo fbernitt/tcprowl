@@ -6,29 +6,22 @@ import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.jdom.Element;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Ajax controller to allow sending of test messages.
  */
 public class ProwlSettingsController extends BaseController {
 
-    public ProwlSettingsController(SBuildServer server, WebControllerManager manager) {
+    private final ProwlConnector prowlConnector;
+
+    public ProwlSettingsController(SBuildServer server, WebControllerManager manager, ProwlConnector prowlConnector) {
         super(server);
+        this.prowlConnector = prowlConnector;
 
         manager.registerController("/tcprowlSettings.html", this);
     }
@@ -39,7 +32,7 @@ public class ProwlSettingsController extends BaseController {
             public void handleRequest(HttpServletRequest request, HttpServletResponse response, Element xmlResponse) {
                 try {
                     sendProwlNotification(request);
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     Loggers.SERVER.warn(e);
                     ActionErrors errors = new ActionErrors();
                     errors.addError("tcprowlProblem", createMessageWithNested(e));
@@ -52,7 +45,7 @@ public class ProwlSettingsController extends BaseController {
         return null;
     }
 
-    private void sendProwlNotification(HttpServletRequest request) throws IOException {
+    private void sendProwlNotification(HttpServletRequest request) {
         String apiKey = request.getParameter("prowlApiKey");
         String message = request.getParameter("prowlTestMessage");
         Loggers.SERVER.info("Sending prowl test notification to [" + apiKey + "]");
@@ -64,22 +57,8 @@ public class ProwlSettingsController extends BaseController {
         return e.getMessage();
     }
 
-    private void doHttpRequestCall(String apiKey, String message) throws IOException {
-        HttpClient client = new DefaultHttpClient();
-        HttpPost post = new HttpPost("http://api.prowlapp.com/publicapi/add");
-
-        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-
-        params.add(new BasicNameValuePair("apikey", apiKey));
-        params.add(new BasicNameValuePair("application", "TeamCity"));
-        params.add(new BasicNameValuePair("event", "tcprowl config test"));
-        params.add(new BasicNameValuePair("description", message));
-        UrlEncodedFormEntity form = new UrlEncodedFormEntity(params);
-        post.setEntity(form);
-
-        HttpResponse response = client.execute(post);
-
-        Loggers.SERVER.info("Response status: " + response.getStatusLine());
-        Loggers.SERVER.info("Response status: " + EntityUtils.toString(response.getEntity()));
+    private void doHttpRequestCall(String apiKey, String message) {
+        ProwlNotification notification = new ProwlNotification(apiKey, "tcprowl config test", message);
+        this.prowlConnector.sendNotification(notification);
     }
 }

@@ -16,4 +16,6 @@
     <bean id="prowlSettingsPage" class="de.fbernitt.teamcity.plugins.tcprowl.ProwlSettingsExtension" />
 
     <bean id="profilerController" class="de.fbernitt.teamcity.plugins.tcprowl.ProwlSettingsController"/>
+
+    <bean id="prowlConnector" class="de.fbernitt.teamcity.plugins.tcprowl.prowl.HttpProwlConnector" />
 </beans>
