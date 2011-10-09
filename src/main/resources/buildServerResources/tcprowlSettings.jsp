@@ -3,23 +3,22 @@
 <script type="text/javascript">
     function sendTest() {
 
-        var gs = $('properties[tcgrowl.gServer].value');
-        if(!gs || gs.value.length == 0) {
-            alert("Please enter the Growl server's IP address.");
-            return;
-        }
-        var gp = $('properties[tcgrowl.gPassword].value');
-
-        var gm = $('growlTestMessage').value;
-        if(!gm || gm.length ==0) {
+        var apiKey = $('properties[tcprowl.gApiKey].value');
+        if(!apiKey || apiKey.value.length == 0) {
+            alert("Please enter the Prowl API key!");
             return;
         }
 
-        BS.ajaxRequest($('growlTestForm').action, {
-            parameters: 'growlServer='+ gs.value + (gp&&gp.value.length>0?'&growlPassword='+gp.value+'&':'&')+'growlTestMessage='+gm,
+        var pm = $('prowlTestMessage').value;
+        if(!pm || pm.length ==0) {
+            return;
+        }
+
+        BS.ajaxRequest($('prowlTestForm').action, {
+            parameters: 'prowlApiKey='+ apiKey.value + '&prowlTestMessage='+pm,
             onComplete: function(transport) {
               if (transport.responseXML) {
-                  $('tcGrowlTest').refresh();
+                  $('tcProwlTest').refresh();
               }
             }
         });
@@ -28,9 +27,9 @@
 </script>
 
 <bs:refreshable containerId="tcProwlTest" pageUrl="${pageUrl}">
-<bs:messages key="tcgrowlMessage"/>
+<bs:messages key="tcprowlMessage"/>
 
-<form action="/tcgrowlSettings.html" method="post" id="growlTestForm">
-Send test message to Growl server: <input id="growlTestMessage" name="growlTestMessage" type="text" />  <input type="button" name="Test" value="Test" onclick="return sendTest();"/>
+<form action="/tcprowlSettings.html" method="post" id="prowlTestForm">
+Send test message to Prowl server: <input id="prowlTestMessage" name="prowlTestMessage" type="text" />  <input type="button" name="Test" value="Test" onclick="return sendTest();"/>
 </form>
 </bs:refreshable>

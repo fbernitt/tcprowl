@@ -1,19 +1,20 @@
 package de.fbernitt.teamcity.plugins.tcprowl;
 
 import jetbrains.buildServer.Build;
+import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.notification.Notificator;
+import jetbrains.buildServer.notification.NotificatorRegistry;
 import jetbrains.buildServer.responsibility.ResponsibilityEntry;
 import jetbrains.buildServer.responsibility.TestNameResponsibilityEntry;
-import jetbrains.buildServer.serverSide.SBuildType;
-import jetbrains.buildServer.serverSide.SProject;
-import jetbrains.buildServer.serverSide.SRunningBuild;
-import jetbrains.buildServer.serverSide.STest;
+import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.mute.MuteInfo;
 import jetbrains.buildServer.tests.TestName;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.vcs.VcsRoot;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,6 +28,16 @@ public class ProwlNotificator implements Notificator {
 
     private static final String TYPE = "tcprowl";
     private static final String TYPE_NAME = "Prowl Notifier";
+    private static final String PROWL_API_KEY = "tcprowl.gApiKey";
+
+
+    private final List<UserPropertyInfo> userPropertyInfos = new ArrayList<UserPropertyInfo>();
+
+    public ProwlNotificator(NotificatorRegistry notificatorRegistry) {
+        Loggers.SERVER.info("Registering " + TYPE_NAME);
+        userPropertyInfos.add(new UserPropertyInfo(PROWL_API_KEY, "Prowl API Key"));
+        notificatorRegistry.register(this, userPropertyInfos);
+    }
 
     public void notifyBuildStarted(SRunningBuild sRunningBuild, Set<SUser> sUsers) {
         //To change body of implemented methods use File | Settings | File Templates.
@@ -96,7 +107,7 @@ public class ProwlNotificator implements Notificator {
         return TYPE_NAME;
     }
 
-    public void register () {
+    public void register() {
 
     }
 }
