@@ -80,7 +80,7 @@
                                 </copy>
 
                                 <echo message=" - Creating ZIP file"/>
-                                <zip destfile="${project.build.directory}/prowl-${version}.zip"
+                                <zip destfile="${project.build.directory}/prowl-${project.version}.zip"
                                      basedir="${project.build.directory}/dist"
                                         />
 
@@ -99,6 +99,11 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -152,6 +157,7 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.8.4</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

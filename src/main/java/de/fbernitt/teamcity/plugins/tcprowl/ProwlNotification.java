@@ -1,5 +1,7 @@
 package de.fbernitt.teamcity.plugins.tcprowl;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 /**
  * Defines a prowl notification.
  */
@@ -18,7 +20,7 @@ public class ProwlNotification {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (null == o || getClass() != o.getClass()) return false;
 
         ProwlNotification that = (ProwlNotification) o;
 
@@ -35,6 +37,11 @@ public class ProwlNotification {
         result = 31 * result + this.title.hashCode();
         result = 31 * result + this.message.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
     public String getApiKey() {

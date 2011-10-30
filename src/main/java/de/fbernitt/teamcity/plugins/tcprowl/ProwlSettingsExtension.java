@@ -4,12 +4,12 @@ import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PlaceId;
 import jetbrains.buildServer.web.openapi.SimplePageExtension;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
- * Created by IntelliJ IDEA.
- * User: folker
- * Date: 09.10.11
- * Time: 14:07
- * To change this template use File | Settings | File Templates.
+ * Page extension to provide prowl test ui elements.
+ * <p>
+ * This extension is only visible on prowl notifier page.
  */
 public class ProwlSettingsExtension extends SimplePageExtension {
     public ProwlSettingsExtension(PagePlaces pagePlaces) {
@@ -18,5 +18,11 @@ public class ProwlSettingsExtension extends SimplePageExtension {
         setPlaceId(PlaceId.NOTIFIER_SETTINGS_FRAGMENT);
         setPluginName("tcprowl");
         register();
+    }
+
+    @Override
+    public boolean isAvailable(HttpServletRequest request) {
+        String notificatorType = request.getParameter("notificatorType");
+        return "tcprowl".equals(notificatorType);
     }
 }

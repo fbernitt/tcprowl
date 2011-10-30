@@ -3,7 +3,7 @@
 <script type="text/javascript">
     function sendTest() {
 
-        var apiKey = $('properties[tcprowl.gApiKey].value');
+        var apiKey = $('properties[apiKey].value');
         if(!apiKey || apiKey.value.length == 0) {
             alert("Please enter the Prowl API key!");
             return;
