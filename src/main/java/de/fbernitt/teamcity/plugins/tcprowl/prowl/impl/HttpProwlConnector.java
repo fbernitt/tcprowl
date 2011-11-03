@@ -1,7 +1,10 @@
-package de.fbernitt.teamcity.plugins.tcprowl.prowl;
+package de.fbernitt.teamcity.plugins.tcprowl.prowl.impl;
 
-import de.fbernitt.teamcity.plugins.tcprowl.ProwlConnector;
+import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlConnector;
 import de.fbernitt.teamcity.plugins.tcprowl.ProwlNotification;
+import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlException;
+import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlResult;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -33,14 +36,18 @@ public class HttpProwlConnector implements ProwlConnector {
             this.httpClient = httpClient;
         }
 
-        public void sendMessage(String eventTitle, String message) throws RuntimeException {
+        public ProwlResult sendMessage(String eventTitle, String message) throws RuntimeException {
             try {
                 HttpPost post = new HttpPost(PROWL_SERVER_URL);
                 post.setEntity(constructPostParams(eventTitle, message));
-                this.httpClient.execute(post);
+                return parseResponse(this.httpClient.execute(post));
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new ProwlException(e);
             }
+        }
+
+        private ProwlResult parseResponse(HttpResponse response) {
+            return new ProwlResult(0, null);
         }
 
         private UrlEncodedFormEntity constructPostParams(String eventTitle, String message) throws UnsupportedEncodingException {
@@ -53,8 +60,8 @@ public class HttpProwlConnector implements ProwlConnector {
         }
     }
 
-    public void sendNotification(ProwlNotification notification) {
-         new HttpClientProwlCaller(notification.getApiKey(), createHttpClient()).sendMessage(notification.getTitle(), notification.getMessage());
+    public ProwlResult sendNotification(ProwlNotification notification) {
+        return new HttpClientProwlCaller(notification.getApiKey(), createHttpClient()).sendMessage(notification.getTitle(), notification.getMessage());
     }
 
     HttpClient createHttpClient () {

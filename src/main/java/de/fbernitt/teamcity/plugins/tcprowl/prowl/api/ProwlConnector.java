@@ -1,4 +1,6 @@
-package de.fbernitt.teamcity.plugins.tcprowl;
+package de.fbernitt.teamcity.plugins.tcprowl.prowl.api;
+
+import de.fbernitt.teamcity.plugins.tcprowl.ProwlNotification;
 
 /**
  * Provides an interface to the prowl server.
@@ -11,6 +13,8 @@ public interface ProwlConnector {
      * Sends the notification to prowl service.
      *
      * @param notification The notification
+     * @return The prowl result
+     * @throws ProwlException
      */
-    void sendNotification(ProwlNotification notification);
+    ProwlResult sendNotification(ProwlNotification notification);
 }

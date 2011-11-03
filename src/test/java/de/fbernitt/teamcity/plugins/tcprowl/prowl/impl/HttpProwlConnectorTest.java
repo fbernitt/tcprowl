@@ -1,6 +1,10 @@
-package de.fbernitt.teamcity.plugins.tcprowl.prowl;
+package de.fbernitt.teamcity.plugins.tcprowl.prowl.impl;
 
 import de.fbernitt.teamcity.plugins.tcprowl.ProwlNotification;
+import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlException;
+import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlResult;
+import de.fbernitt.teamcity.plugins.tcprowl.prowl.impl.IsExpectedPost;
+import de.fbernitt.teamcity.plugins.tcprowl.prowl.impl.HttpProwlConnector;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -11,9 +15,11 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.util.HashMap;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the HttpProwlConnector.
@@ -27,12 +33,15 @@ public class HttpProwlConnectorTest {
 
     @Test
     public void thatMessageIsSent () throws Exception {
-       createConnector().sendNotification(createNotification("foo", "bar"));
+        when(this.mockHttpClient.execute(Matchers.<HttpUriRequest>any())).thenReturn(null);
+        ProwlResult result = createConnector().sendNotification(createNotification("foo", "bar"));
+
+        assertNotNull(result);
 
         verify(this.mockHttpClient).execute(isExpectedPost("foo", "bar"));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = ProwlException.class)
     public void thatErrorIsHandled () throws Exception {
         Mockito.when(this.mockHttpClient.execute(Matchers.<HttpUriRequest>any())).thenThrow(new IOException());
 
@@ -41,6 +50,7 @@ public class HttpProwlConnectorTest {
 
     private HttpProwlConnector createConnector() {
         return new HttpProwlConnector() {
+
             @Override
             HttpClient createHttpClient() {
                 return HttpProwlConnectorTest.this.mockHttpClient;

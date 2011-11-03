@@ -1,5 +1,7 @@
 package de.fbernitt.teamcity.plugins.tcprowl;
 
+import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlConnector;
+import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlException;
 import jetbrains.buildServer.Build;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.notification.Notificator;
@@ -131,7 +133,10 @@ public class ProwlNotificator implements Notificator {
         String message =  "Build " + build.getStatusDescriptor().getStatus().getText() + ": " + build.getFullName() + " on agent " + build.getAgentName();
 
         ProwlNotification notification = new ProwlNotification(apiKey, title, message);
-
+        try {
         this.prowlConnector.sendNotification(notification);
+        } catch (ProwlException e) {
+            Loggers.SERVER.error("Failed to send message to prowl: " + e.getMessage(), e);
+        }
     }
 }

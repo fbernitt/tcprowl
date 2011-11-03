@@ -1,5 +1,6 @@
 package de.fbernitt.teamcity.plugins.tcprowl;
 
+import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlConnector;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.AjaxRequestProcessor;
 import jetbrains.buildServer.controllers.BaseController;

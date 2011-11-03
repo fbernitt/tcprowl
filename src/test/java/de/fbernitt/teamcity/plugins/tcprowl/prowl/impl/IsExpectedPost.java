@@ -1,4 +1,4 @@
-package de.fbernitt.teamcity.plugins.tcprowl.prowl;
+package de.fbernitt.teamcity.plugins.tcprowl.prowl.impl;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
