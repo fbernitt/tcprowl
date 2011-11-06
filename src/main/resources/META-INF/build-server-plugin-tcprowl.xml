@@ -3,11 +3,6 @@
 
 <beans default-autowire="constructor">
 
-	<bean id="prowlMainSettings"
-		class="de.fbernitt.teamcity.plugins.tcprowl.ProwlMainSettings"
-		init-method="register"
-		/>
-
 	<bean id="prowlNotificator"
 		class="de.fbernitt.teamcity.plugins.tcprowl.ProwlNotificator"
   		init-method="register"
