@@ -9,6 +9,10 @@ public class ProwlException extends RuntimeException {
         super(t);
     }
 
+    public ProwlException (String message) {
+        super(message);
+    }
+
     public ProwlException(String s, Throwable t) {
         super(s, t);
     }

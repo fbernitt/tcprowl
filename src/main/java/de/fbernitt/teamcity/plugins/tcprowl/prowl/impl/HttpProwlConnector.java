@@ -47,7 +47,7 @@ public class HttpProwlConnector implements ProwlConnector {
         }
 
         private ProwlResult parseResponse(HttpResponse response) {
-            return new ProwlResult(0, null);
+            return new ProwlResponseParser().parse(response);
         }
 
         private UrlEncodedFormEntity constructPostParams(String eventTitle, String message) throws UnsupportedEncodingException {

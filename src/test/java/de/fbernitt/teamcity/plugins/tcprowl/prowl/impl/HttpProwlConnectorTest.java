@@ -30,10 +30,11 @@ public class HttpProwlConnectorTest {
     private static final String ADD_POST_URL = "http://api.prowlapp.com/publicapi/add";
 
     private final HttpClient mockHttpClient = mock(HttpClient.class);
+    private final TestResponseBuilder responseBuilder = new TestResponseBuilder();
 
     @Test
     public void thatMessageIsSent () throws Exception {
-        when(this.mockHttpClient.execute(Matchers.<HttpUriRequest>any())).thenReturn(null);
+        when(this.mockHttpClient.execute(Matchers.<HttpUriRequest>any())).thenReturn(this.responseBuilder.buildSuccessResponse(42));
         ProwlResult result = createConnector().sendNotification(createNotification("foo", "bar"));
 
         assertNotNull(result);
