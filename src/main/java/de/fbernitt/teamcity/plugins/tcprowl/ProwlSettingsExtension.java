@@ -8,21 +8,26 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Page extension to provide prowl test ui elements.
- * <p>
+ * <p/>
  * This extension is only visible on prowl notifier page.
  */
 public class ProwlSettingsExtension extends SimplePageExtension {
+
+    static final String NOTIFICATOR_TYPE = "notificatorType";
+    static final String PLUGIN_NAME = "tcprowl";
+    static final String TCPROWL_SETTINGS_JSP = "tcprowlSettings.jsp";
+
     public ProwlSettingsExtension(PagePlaces pagePlaces) {
         super(pagePlaces);
-        setIncludeUrl("tcprowlSettings.jsp");
+        setIncludeUrl(TCPROWL_SETTINGS_JSP);
         setPlaceId(PlaceId.NOTIFIER_SETTINGS_FRAGMENT);
-        setPluginName("tcprowl");
+        setPluginName(PLUGIN_NAME);
         register();
     }
 
     @Override
     public boolean isAvailable(HttpServletRequest request) {
-        String notificatorType = request.getParameter("notificatorType");
-        return "tcprowl".equals(notificatorType);
+        String notificatorType = request.getParameter(NOTIFICATOR_TYPE);
+        return PLUGIN_NAME.equals(notificatorType);
     }
 }

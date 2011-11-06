@@ -1,5 +1,6 @@
 package de.fbernitt.teamcity.plugins.tcprowl;
 
+import com.intellij.openapi.diagnostic.Logger;
 import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlConnector;
 import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlException;
 import jetbrains.buildServer.Build;
@@ -22,27 +23,23 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: folker
- * Date: 09.10.11
- * Time: 13:12
- * To change this template use File | Settings | File Templates.
+ * Registers into TeamCity as a Notificator for prowl.
  */
 public class ProwlNotificator implements Notificator {
-
-    private static final String TYPE = "tcprowl";
-    private static final String TYPE_NAME = "Prowl Notifier";
-    private static final String PROPERTY_APIKEY = "apiKey";
-    private static final PropertyKey PROPERTY_APIKEY_KEY = new NotificatorPropertyKey(TYPE, PROPERTY_APIKEY);
+    static final String TYPE = "tcprowl";
+    static final String TYPE_NAME = "Prowl Notifier";
+    static final String PROPERTY_APIKEY = "apiKey";
+    static final PropertyKey PROPERTY_APIKEY_KEY = new NotificatorPropertyKey(TYPE, PROPERTY_APIKEY);
+    static final String PROWL_APIKEY_DESCRIPTION = "Prowl API Key";
 
     private final ProwlConnector prowlConnector;
 
     public ProwlNotificator(NotificatorRegistry notificatorRegistry, ProwlConnector prowlConnector) {
         this.prowlConnector = prowlConnector;
 
-        Loggers.SERVER.info("Registering " + TYPE_NAME);
+        logger().info("Registering " + TYPE_NAME);
         List<UserPropertyInfo> userPropertyInfos = new ArrayList<UserPropertyInfo>();
-        userPropertyInfos.add(new UserPropertyInfo(PROPERTY_APIKEY, "Prowl API Key"));
+        userPropertyInfos.add(new UserPropertyInfo(PROPERTY_APIKEY, PROWL_APIKEY_DESCRIPTION));
         notificatorRegistry.register(this, userPropertyInfos);
     }
 
@@ -75,7 +72,7 @@ public class ProwlNotificator implements Notificator {
     }
 
     public void notifyResponsibleChanged(SBuildType sBuildType, Set<SUser> sUsers) {
-         // not yet implemented
+        // not yet implemented
     }
 
     public void notifyResponsibleAssigned(SBuildType sBuildType, Set<SUser> sUsers) {
@@ -118,25 +115,46 @@ public class ProwlNotificator implements Notificator {
 
     }
 
-    private void notifyUsers (SRunningBuild build, Set<SUser> sUsers) {
-        Loggers.SERVER.info("Prowl: Notify users about " + build.getFullName());
+    private void notifyUsers(SRunningBuild build, Set<SUser> sUsers) {
+        logger().info("Prowl: Notify users about " + build.getFullName());
         for (SUser user : sUsers) {
             notifyUser(build, user);
         }
     }
 
-    private void notifyUser (SRunningBuild build, SUser user) {
-         Loggers.SERVER.info("Prowl: Notify " + user.getName() + " about " + build.getFullName());
+    private void notifyUser(SRunningBuild build, SUser user) {
+        logger().info("Prowl: Notify " + user.getName() + " about " + build.getFullName());
 
         String apiKey = user.getPropertyValue(PROPERTY_APIKEY_KEY);
-        String title =  build.getStatusDescriptor().getStatus().getText() + ": " + build.getBuildTypeName() + "#" + build.getBuildNumber();
-        String message =  "Build " + build.getStatusDescriptor().getStatus().getText() + ": " + build.getFullName() + " on agent " + build.getAgentName();
-
-        ProwlNotification notification = new ProwlNotification(apiKey, title, message);
-        try {
-        this.prowlConnector.sendNotification(notification);
-        } catch (ProwlException e) {
-            Loggers.SERVER.error("Failed to send message to prowl: " + e.getMessage(), e);
+        if (isApiKeyAvailable(apiKey)) {
+            logger().info("Skipped notification of " + user.getName() + " because no API key is defined!");
+            return; // skip notification
         }
+
+        ProwlNotification notification = constructNotification(build, apiKey);
+        sendNotification(notification);
+    }
+
+    private void sendNotification(ProwlNotification notification) {
+        try {
+            this.prowlConnector.sendNotification(notification);
+        } catch (ProwlException e) {
+            logger().error("Failed to send message to prowl: " + e.getMessage(), e);
+        }
+    }
+
+    private ProwlNotification constructNotification(SRunningBuild build, String apiKey) {
+        String title = build.getStatusDescriptor().getStatus().getText() + ": " + build.getBuildTypeName() + "#" + build.getBuildNumber();
+        String message = "Build " + build.getStatusDescriptor().getStatus().getText() + ": " + build.getFullName() + " on agent " + build.getAgentName();
+
+        return new ProwlNotification(apiKey, title, message);
+    }
+
+    private boolean isApiKeyAvailable(String apiKey) {
+        return apiKey == null || apiKey.trim().length() == 0;
+    }
+
+    Logger logger() {
+        return Loggers.SERVER;
     }
 }
