@@ -17,7 +17,7 @@ import java.io.StringWriter;
 /**
  * Utility class to help build prowl http responses.
  */
-class TestResponseBuilder {
+class ProwlHttpResponseBuilder {
     public static final ProtocolVersion PROTOCOL_VERSION = new ProtocolVersion("HTTP", 1, 1);
 
     public BasicHttpResponse buildErrorResponse(int statusCode, String errorMsg) throws IOException {

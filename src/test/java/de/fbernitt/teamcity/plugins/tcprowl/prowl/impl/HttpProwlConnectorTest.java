@@ -3,8 +3,6 @@ package de.fbernitt.teamcity.plugins.tcprowl.prowl.impl;
 import de.fbernitt.teamcity.plugins.tcprowl.ProwlNotification;
 import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlException;
 import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlResult;
-import de.fbernitt.teamcity.plugins.tcprowl.prowl.impl.IsExpectedPost;
-import de.fbernitt.teamcity.plugins.tcprowl.prowl.impl.HttpProwlConnector;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -30,7 +28,7 @@ public class HttpProwlConnectorTest {
     private static final String ADD_POST_URL = "http://api.prowlapp.com/publicapi/add";
 
     private final HttpClient mockHttpClient = mock(HttpClient.class);
-    private final TestResponseBuilder responseBuilder = new TestResponseBuilder();
+    private final ProwlHttpResponseBuilder responseBuilder = new ProwlHttpResponseBuilder();
 
     @Test
     public void thatMessageIsSent () throws Exception {

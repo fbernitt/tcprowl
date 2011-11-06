@@ -17,18 +17,18 @@ import static org.junit.Assert.*;
  */
 public class ProwlResponseParserTest {
 
-    private final TestResponseBuilder testResponseBuilder = new TestResponseBuilder();
+    private final ProwlHttpResponseBuilder prowlHttpResponseBuilder = new ProwlHttpResponseBuilder();
 
     @Test(expected = ProwlException.class)
     public void thatNonSuccessStatusLeadsToException() {
-        ProtocolVersion protocolVersion = TestResponseBuilder.PROTOCOL_VERSION;
+        ProtocolVersion protocolVersion = ProwlHttpResponseBuilder.PROTOCOL_VERSION;
         BasicHttpResponse response = new BasicHttpResponse(new BasicStatusLine(protocolVersion, HttpStatus.SC_BAD_REQUEST, null));
         new ProwlResponseParser().parse(response);
     }
 
     @Test
     public void thatSuccessResponseIsParsed() throws IOException {
-        BasicHttpResponse response = this.testResponseBuilder.buildSuccessResponse(42);
+        BasicHttpResponse response = this.prowlHttpResponseBuilder.buildSuccessResponse(42);
 
         ProwlResult result = new ProwlResponseParser().parse(response);
 
@@ -39,7 +39,7 @@ public class ProwlResponseParserTest {
     @Test
     public void thatErrorResponseRaisesException() throws IOException {
         final String errorMsg = "A test error occurred!";
-        BasicHttpResponse response = this.testResponseBuilder.buildErrorResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, errorMsg);
+        BasicHttpResponse response = this.prowlHttpResponseBuilder.buildErrorResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, errorMsg);
         try {
             new ProwlResponseParser().parse(response);
             fail("ProwlException expected!");
