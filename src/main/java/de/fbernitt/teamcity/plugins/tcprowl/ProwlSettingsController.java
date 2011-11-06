@@ -4,7 +4,6 @@ import de.fbernitt.teamcity.plugins.tcprowl.prowl.api.ProwlConnector;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.AjaxRequestProcessor;
 import jetbrains.buildServer.controllers.BaseController;
-import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
@@ -31,25 +30,27 @@ public class ProwlSettingsController extends BaseController {
     protected ModelAndView doHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         new AjaxRequestProcessor().processRequest(request, response, new AjaxRequestProcessor.RequestHandler() {
             public void handleRequest(HttpServletRequest request, HttpServletResponse response, Element xmlResponse) {
-                try {
-                    sendProwlNotification(request);
-                } catch (RuntimeException e) {
-                    Loggers.SERVER.warn(e);
-                    ActionErrors errors = new ActionErrors();
-                    errors.addError("tcprowlProblem", createMessageWithNested(e));
-                    getOrCreateMessages(request).addMessage("tcprowlMessage", createMessageWithNested(e));
-                    errors.serialize(xmlResponse);
-                }
+                processAjaxRequest(request, xmlResponse);
             }
         });
 
         return null;
     }
 
+    void processAjaxRequest(HttpServletRequest request, Element xmlResponse) {
+        try {
+            sendProwlNotification(request);
+        } catch (RuntimeException e) {
+            ActionErrors errors = new ActionErrors();
+            errors.addError("tcprowlProblem", createMessageWithNested(e));
+            getOrCreateMessages(request).addMessage("tcprowlMessage", createMessageWithNested(e));
+            errors.serialize(xmlResponse);
+        }
+    }
+
     private void sendProwlNotification(HttpServletRequest request) {
         String apiKey = request.getParameter("prowlApiKey");
         String message = request.getParameter("prowlTestMessage");
-        Loggers.SERVER.info("Sending prowl test notification to [" + apiKey + "]");
         doHttpRequestCall(apiKey, message);
         getOrCreateMessages(request).addMessage("tcprowlMessage", "Message sent!");
     }

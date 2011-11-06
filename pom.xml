@@ -4,7 +4,7 @@
     <groupId>de.fbernitt.teamcity.plugins</groupId>
     <artifactId>tcprowl</artifactId>
     <name>tcprowl</name>
-    <version>0.1.alpha</version>
+    <version>0.1</version>
     <description>A teamcity plugin for prowl notifications</description>
     <build>
         <defaultGoal>package</defaultGoal>
